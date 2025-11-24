@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度综述：微纳气泡在农业根际氧环境调控中的应用</title>
+    <style>
+        :root {
+            --primary: #2E8B57; /* 海洋绿 */
+            --primary-dark: #1e5e3a;
+            --accent: #00BFFF; /* 深空蓝 */
+            --bg-light: #f4fcf6;
+            --text-main: #2c3e50;
+            --text-light: #7f8c8d;
+            --card-bg: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        /* --- 基础设置 --- */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.8;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { margin-top: 0; font-weight: 700; }
+        
+        /* --- 动态背景画布 --- */
+        #bubble-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* --- 头部 Hero Section --- */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #206d42 100%);
+            color: white;
+            padding: 80px 20px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: slideDown 1s ease-out;
+        }
+
+        header h1 { font-size: 2.8em; margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .meta-box {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            font-size: 0.9em;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* --- 布局容器 --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* --- 章节通用动画 --- */
+        section {
+            margin-bottom: 60px;
+            opacity: 0; /* 初始隐藏 */
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: var(--primary);
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent);
+            margin-top: 8px;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        
+        section:hover .section-title::after { width: 100%; }
+
+        /* --- 问题阐述卡片 --- */
+        .problem-box {
+            background: #fff3cd;
+            border-left: 6px solid #ffc107;
+            padding: 25px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: var(--shadow);
+        }
+        .problem-icon { font-size: 3em; }
+
+        /* --- 特性 Grid --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 4px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,191,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .feature-card:hover::before { opacity: 1; }
+
+        /* --- 对比表格 --- */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: white;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:last-child td { border-bottom: none; }
+        .comparison-table tr:hover { background-color: #f8fcf9; }
+
+        /* --- 机制折叠面板 (Accordion) --- */
+        .accordion {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .accordion-item { border-bottom: 1px solid #eee; }
+        
+        .accordion-header {
+            padding: 20px;
+            cursor: pointer;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .accordion-header:hover { background: var(--bg-light); color: var(--primary); }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            background: #fafafa;
+            padding: 0 20px;
+        }
+        
+        .accordion-content.active { padding: 20px; max-height: 500px; /* 近似高度 */ }
+
+        /* --- 数据可视化动画条 --- */
+        .stat-bar-container {
+            margin: 20px 0;
+        }
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .progress-bg {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%);
+            width: 0; /* 初始宽度 */
+            border-radius: 10px;
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%, transparent);
+            background-size: 20px 20px;
+            animation: moveStripe 1s linear infinite;
+        }
+
+        /* --- [新增] 论文图片样式 --- */
+        .paper-figure-container {
+            margin-top: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .paper-figure {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: block;
+            max-width: 100%; 
+            object-fit: contain;
+            background-color: #f0f0f0; /* 图片加载前的背景色 */
+        }
+        
+        .figure-caption {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 12px;
+            font-weight: 500;
+            display: block;
+        }
+
+        /* --- 动画 Keyframes --- */
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes moveStripe {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 20px; }
+        }
+
+        /* --- 脚注 --- */
+        footer {
+            background: #333;
+            color: #aaa;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+        }
+        footer a { color: white; text-decoration: none; border-bottom: 1px dotted white; }
+
+        /* --- 响应式 --- */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2em; }
+            .grid-container { grid-template-columns: 1fr; }
+            .problem-box { flex-direction: column; text-align: center; }
+            .figure-caption { font-size: 0.85em; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 头部背景动画 Canvas -->
+<header>
+    <canvas id="bubble-canvas"></canvas>
+    <div class="header-content">
+        <h1>微纳气泡：植物根际氧环境的<br>革命性调控技术</h1>
+        <div class="subtitle">Agronomy 2025 | 深度综述与应用前景</div>
+        <br>
+        <div class="meta-box">
+            <span>📅 2025年11月14日发表</span> &nbsp;|&nbsp; 
+            <span>✍️ Zheng, K. 等</span> &nbsp;|&nbsp; 
+            <span>🔬 西南大学</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 第一部分：背景问题 -->
+    <section id="intro">
+        <h2 class="section-title">🛑 农业困境与研究概览</h2>
+        
+        <!-- 图1：相对路径（关键修改）→ ./images/ 表示和index.html同目录下的images文件夹 -->
+        <div class="paper-figure-container">
+            <img src="./images/tup1.png" alt="微纳气泡在农业中的应用及其对根际缺氧的影响" class="paper-figure">
+            <span class="figure-caption">图 1：微纳气泡在农业中的应用及其对根际缺氧的影响 (Application of micro-nano bubbles in agriculture and their effects on rhizosphere hypoxia)</span>
+        </div>
+
+        <div class="problem-box">
+            <div class="problem-icon">📉</div>
+            <div>
+                <h3>土壤板结与洪涝的双重打击</h3>
+                <p>
+                    现代农业中，重型机械导致的<strong>土壤板结</strong>和气候变化引发的<strong>洪涝灾害</strong>，严重破坏了土壤孔隙结构。
+                    文献指出，<strong>氧气在水中的扩散速率仅为空气中的 1/10000</strong>。当土壤孔隙被水充满时，氧气无法到达深层根系，导致：
+                </p>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>根系有氧呼吸受阻，ATP 能量合成减少。</li>
+                    <li>植物被迫转向糖酵解发酵，产生乙醇等有毒物质。</li>
+                    <li>活性氧 (ROS) 爆发，破坏细胞结构，最终导致作物大幅减产。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第二部分：MNBs 核心特性 -->
+    <section id="properties">
+        <h2 class="section-title">✨ MNBs：微观物理学的胜利</h2>
+        <p>微纳气泡 (Micro-Nano Bubbles, 直径<100μm) 并非普通气泡，它们具备特殊的物理化学性质，使其成为解决缺氧问题的“银色子弹”。</p>
+        
+        <div class="grid-container">
+            <div class="feature-card">
+                <h3>🌊 超高比表面积</h3>
+                <p>同体积下，1个10微米气泡的表面积远大于普通气泡。极大的气液接触面积显著提高了氧气的传质效率（OTR），使溶氧速度提升约15倍。</p>
+            </div>
+            <div class="feature-card">
+                <h3>⏱️ 极长停留时间</h3>
+                <p>受布朗运动影响大，浮力影响小。它们可以在水中悬浮数小时甚至数天，确保持续为根系供应氧气，而不会像普通气泡那样迅速浮出水面破裂。</p>
+            </div>
+            <div class="feature-card">
+                <h3>⚡ 表面带负电荷</h3>
+                <p>Zeta 电位通常在 -27 到 -45 mV。这使气泡能吸附带正电的土壤颗粒，防止自身聚并，并能深入土壤微孔隙，改善土壤团粒结构。</p>
+            </div>
+            <div class="feature-card">
+                <h3>💥 自身增压与ROS</h3>
+                <p>气泡收缩破裂时会产生微弱的冲击波和适量的活性氧 (ROS)。适量的 ROS 可作为信号分子，激活植物的抗逆防御系统。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第三部分：制备技术 -->
+    <section id="methods">
+        <h2 class="section-title">⚙️ 三大制备技术对比</h2>
+        <p>文献对比了空化法、电解法和膜分散法，针对农业灌溉场景给出了明确推荐。</p>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th width="20%">方法</th>
+                    <th width="30%">原理</th>
+                    <th width="25%">优点</th>
+                    <th width="25%">农业适用性评价</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>水力空化法</strong><br>(Venturi/Swirling)</td>
+                    <td>利用流体流速变化产生负压，吸入空气并剪切粉碎。</td>
+                    <td>结构简单、不易堵塞、成本低、可连续大规模生产。</td>
+                    <td>⭐⭐⭐⭐⭐<br><span style="color:var(--primary);font-weight:bold;">农业灌溉首选</span></td>
+                </tr>
+                <tr>
+                    <td><strong>电解法</strong></td>
+                    <td>电极电解水在阴阳极产生微小气泡。</td>
+                    <td>气泡尺寸极小且均匀。</td>
+                    <td>⭐⭐<br>能耗高，仅适合小型实验。</td>
+                </tr>
+                <tr>
+                    <td><strong>膜分散法</strong></td>
+                    <td>气体加压通过微孔膜。</td>
+                    <td>气泡粒径可控。</td>
+                    <td>⭐⭐<br>膜孔极易被灌溉水中的杂质堵塞，维护成本高。</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 第四部分：缓解机制 -->
+    <section id="mechanisms">
+        <h2 class="section-title">🧬 MNBs 缓解缺氧的多重机制</h2>
+        
+        <!-- 图2：相对路径（关键修改） -->
+        <div class="paper-figure-container">
+            <img src="./images/tup2.png" alt="植物根际缺氧机理及MNBs缓解机制" class="paper-figure">
+            <span class="figure-caption">图 2：植物根际缺氧机理及MNBs缓解缺氧的机制图 (Mechanism diagram of rhizosphere hypoxia in plants and rhizosphere hypoxia alleviation by MNBs)</span>
+        </div>
+
+        <p>点击下方标题查看详细机理：</p>
+        
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    1. 生理层面：恢复呼吸与抗氧化 <span>▼</span>
+                </div>
+                <div class="accordion-content">
+                    <p>MNBs 提供持续的氧源，使作物根系维持有氧呼吸，保证水分和养分的吸收动力（ATP）。此外，富氧环境提高了过氧化氢酶 (CAT) 和过氧化物酶 (POD) 的活性，帮助植物清除缺氧胁迫产生的过量活性氧 (ROS)，减轻氧化损伤。</p>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    2. 物理层面：重塑土壤结构 <span>▼</span>
+                </div>
+                <div class="accordion-content">
+                    <p>在粘土或盐碱地中，MNBs 的表面电荷有助于土壤颗粒的凝聚，促进微团粒结构的形成。数据显示，MNB 灌溉可使土壤通气孔隙度增加约 <strong>5%</strong>，从物理上打破板结，为根系“松绑”。</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    3. 微生态层面：调控微生物群落 <span>▼</span>
+                </div>
+                <div class="accordion-content">
+                    <p>根际氧气水平的提高改变了微生物群落结构：抑制了反硝化细菌等厌氧菌（减少氮流失），显著增加了好氧细菌（如固氮菌、溶磷菌）的丰度，从而提高了土壤养分的有效性。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第五部分：数据实证 -->
+    <section id="data-proof">
+        <h2 class="section-title">📈 真实增产数据 (Data Proof)</h2>
+        <p>以下数据源自文中引用的多项田间与实验室研究：</p>
+
+        <div class="stat-bar-container">
+            <div class="stat-label">
+                <span>🍅 番茄产量提升 (滴灌系统)</span>
+                <span>12% - 44%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" data-width="44%"></div></div>
+        </div>
+
+        <div class="stat-bar-container">
+            <div class="stat-label">
+                <span>🥬 苋菜叶面积增加 (水培)</span>
+                <span>414%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" data-width="100%"></div></div> <!-- Scaled visual -->
+        </div>
+
+        <div class="stat-bar-container">
+            <div class="stat-label">
+                <span>🍚 水稻增产 (早稻/晚稻)</span>
+                <span>5% - 14%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" data-width="14%"></div></div>
+        </div>
+
+        <div class="stat-bar-container">
+            <div class="stat-label">
+                <span>🌱 种子发芽率提升 (生菜/番茄)</span>
+                <span>6% - 25%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" data-width="25%"></div></div>
+        </div>
+        
+        <p style="font-size: 0.9em; color: #666; margin-top: 10px;">*注：苋菜叶面积增加数据极为显著，此处条形图已做归一化视觉处理。</p>
+    </section>
+
+    <!-- 第六部分：广阔应用与未来 -->
+    <section id="future">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <div>
+                <h2 class="section-title">🌏 更广阔的应用领域</h2>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 15px; display: flex; align-items: start;">
+                        <span style="color: var(--primary); margin-right: 10px;">✔</span>
+                        <div><strong>盐碱地改良：</strong>MNBs 配合微生物制剂，可降低土壤电导率和 pH 值，加速盐分淋洗。</div>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: start;">
+                        <span style="color: var(--primary); margin-right: 10px;">✔</span>
+                        <div><strong>水产共作：</strong>在稻虾共作系统中，增产水稻 26.8%，同时提升小龙虾品质。</div>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: start;">
+                        <span style="color: var(--primary); margin-right: 10px;">✔</span>
+                        <div><strong>采后保鲜：</strong>臭氧微纳气泡水（O3-MNBW）可有效去除农残，延长荔枝、香菜等果蔬的保鲜期。</div>
+                    </li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: start;">
+                        <span style="color: var(--primary); margin-right: 10px;">✔</span>
+                        <div><strong>污水治理：</strong>高效去除抗生素（如氧氟沙星）残留，净化地下水。</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <!-- 图3：相对路径（关键修改） -->
+                <div class="paper-figure-container" style="margin-top:0;">
+                    <img src="./images/tup3.png" alt="MNBs水肥一体化灌溉应用场景模拟图" class="paper-figure">
+                    <span class="figure-caption">图 3：MNBs水肥一体化灌溉应用场景模拟图 (Simulation diagram of the application scenario for MNBs integrated with water and fertilizer irrigation)</span>
+                </div>
+
+                <div style="background: var(--bg-light); padding: 25px; border-radius: 10px; border: 1px dashed var(--primary); margin-top: 20px;">
+                    <h3 style="color: var(--primary-dark); margin-top:0;">🚀 结论与展望</h3>
+                    <p>微纳气泡技术通过“供氧+改土+调菌”三位一体的机制，为解决农业根际缺氧提供了创新方案。</p>
+                    <p><strong>未来发展方向：</strong></p>
+                    <ol style="padding-left: 20px;">
+                        <li><strong>智能化调控：</strong>结合土壤氧传感器，实现“缺氧即补”的精准自动化灌溉。</li>
+                        <li><strong>设备降本：</strong>开发低能耗、抗堵塞的大田专用发生器。</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>文献来源：</strong> Zheng, K.; Zeng, H.; Liu, R.; et al. <em>Research Progress on the Regulation of Plant Rhizosphere Oxygen Environment by Micro-Nano Bubbles...</em> Agronomy 2025, 15, 2620.</p>
+        <p><a href="https://doi.org/10.3390/agronomy15112620" target="_blank">点击查看原文 DOI: 10.3390/agronomy15112620</a></p>
+        <p>© 2025 生成总结网页 | Powered by AI Assistant</p>
+    </footer>
+
+</div>
+
+<!-- 脚本部分 -->
+<script>
+    // 1. 气泡背景动画
+    const canvas = document.getElementById('bubble-canvas');
+    const ctx = canvas.getContext('2d');
+    let bubbles = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = document.querySelector('header').offsetHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Bubble {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height + Math.random() * 100;
+            this.size = Math.random() * 15 + 2; // 模拟微纳气泡的大小差异
+            this.speed = Math.random() * 1 + 0.2;
+            this.opacity = Math.random() * 0.5 + 0.1;
+        }
+        update() {
+            this.y -= this.speed;
+            if (this.y < -50) {
+                this.y = canvas.height + Math.random() * 50;
+                this.x = Math.random() * canvas.width;
+            }
+        }
+        draw() {
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function initBubbles() {
+        bubbles = [];
+        for (let i = 0; i < 60; i++) {
+            bubbles.push(new Bubble());
+        }
+    }
+
+    function animateBubbles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        bubbles.forEach(bubble => {
+            bubble.update();
+            bubble.draw();
+        });
+        requestAnimationFrame(animateBubbles);
+    }
+
+    initBubbles();
+    animateBubbles();
+
+    // 2. 滚动显现动画 (Scroll Reveal)
+    const observerOptions = {
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                
+                // 如果是数据部分，触发进度条动画
+                if(entry.target.id === 'data-proof') {
+                    animateProgressBars();
+                }
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('section').forEach(section => {
+        observer.observe(section);
+    });
+
+    // 3. 进度条动画逻辑
+    function animateProgressBars() {
+        const bars = document.querySelectorAll('.progress-fill');
+        bars.forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            bar.style.width = width;
+        });
+    }
+
+    // 4. 折叠面板逻辑
+    function toggleAccordion(header) {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('span');
+        
+        if (content.classList.contains('active')) {
+            content.classList.remove('active');
+            content.style.maxHeight = null;
+            icon.innerText = '▼';
+        } else {
+            content.classList.add('active');
+            content.style.maxHeight = content.scrollHeight + "px";
+            icon.innerText = '▲';
+        }
+    }
+</script>
+
+</body>
+</html>
